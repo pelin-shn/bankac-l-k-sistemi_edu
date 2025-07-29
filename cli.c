@@ -47,7 +47,7 @@ User addUserMenu()
     scanf("%lf", &p.Balance);
     // Balance kontrol edilecek, örn: negatif olmaması lazım, harf olmaması lazım
 
-    if (save_user_to_file(&p)) // kaydetme işlemi banka'da olacak
+    if (saveUserToFile(&p)) // kaydetme işlemi banka'da olacak
     {
         printf("Kullanici başariyla eklendi.\n");
     }
@@ -83,11 +83,13 @@ void deleteUserMenu(void)
     printf("Silmek istediginiz kullanici ID'sini girin: ");
     scanf("%d", &id);
 
-    if (deleteUserMenu)
+    if (delete_user_by_id(id))
     {
+
         printf("Kullanici basariyla silindi.\n");
         loglama("Kullanici silindi.");
     }
+
     else
     {
         printf("Kullanici bulunamadi veya silinemedi.\n");

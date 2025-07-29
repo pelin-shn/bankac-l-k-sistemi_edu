@@ -9,16 +9,16 @@ int choice();
 User addUserMenu(void);
 
 // Kullanıcı işlemleri arayüzleri (CLI)
-void create_user_menu(void);
-void delete_user_menu(void);
-void update_user_menu(void);
-void list_user_msg(void);
+void createUserMenu(void);
+void deleteUserMenu(void);
+void updateUserMenu(void);
+void listUserMsg(void);
 
 // Banka işlemleri arayüzleri
-void create_account_menu(void);
-void delete_account_menu(void);
-void deposit_menu(void);
-void withdraw_menu(void);
-void transfer_menu(void);
+void createAccountMenu(void);
+void deleteAccountMenu(void);
+void depositMenu(void);
+void withdrawMenu(void);
+void transferMenu(void);
 
 #endif

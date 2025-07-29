@@ -7,7 +7,7 @@
 void createAccount(User p)
 {
 
-    if (check_user_exists(p.ID))
+    if (checkUserExists(p.ID))
     {
         printf("Bu ID zaten mevcut! Lütfen farkli bir ID girin.\n");
         loglama("Kullanici eklenemedi: ID zaten mevcut.");
@@ -60,7 +60,7 @@ void start(void)
             updateUserMenu();
             break;
         case 4:
-            listUserMenu();
+            listUserMsg();
             break;
         case 5:
             depositMenu();

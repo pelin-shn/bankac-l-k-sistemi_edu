@@ -3,15 +3,16 @@
 #include "banka.h"
 #include "userdb.h"
 
-
-void User_update() {  // Kullanici ekleme 
+void User_update()
+{ // Kullanici ekleme
     User p;
     char genderChar;
 
     printf("ID: ");
     scanf("%d", &p.ID);
 
-    if (check_user_exists(p.ID)) {
+    if (checkUserExists(p.ID))
+    {
         printf("Bu ID zaten mevcut! Lütfen farkli bir ID girin.\n");
         loglama("Kullanici eklenemedi: ID zaten mevcut.");
         return;
@@ -38,11 +39,14 @@ void User_update() {  // Kullanici ekleme
     printf("Current Balance: ");
     scanf("%lf", &p.Balance);
 
-    if (save_user_to_file(&p)) {
+    if (saveUserToFile(&p))
+    {
         printf("User saved successfully.\n");
-        loglama("Yeni kullanici eklendi.");  
-    } else {
+        loglama("Yeni kullanici eklendi.");
+    }
+    else
+    {
         printf("Failed to save user.\n");
-        loglama("Kullanici eklenemedi!");    
+        loglama("Kullanici eklenemedi!");
     }
 }

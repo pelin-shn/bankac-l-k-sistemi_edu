@@ -5,7 +5,7 @@
 #define ACCOUNT_FILE "account.txt"
 #define TEMP_FILE "temp.txt"
 
-int save_user_to_file(const User *p)
+int saveUserToFile(const User *p)
 {
     FILE *fp = fopen(ACCOUNT_FILE, "a");
     if (fp == NULL)
@@ -79,7 +79,7 @@ int update_user_in_file(const User *updatedUser)
     return updated;
 }
 
-int check_user_exists(int id)
+int checkUserExists(int id)
 { // Belirli ID'ye sahip kullanıcının varlığını kontrol et
     FILE *fp = fopen(ACCOUNT_FILE, "r");
     if (!fp)
@@ -103,7 +103,7 @@ int check_user_exists(int id)
 }
 
 int delete_user_by_id(int id)
-{ // Belirli ID'ye sahip kullanıcıyı sil
+{
     FILE *fp = fopen(ACCOUNT_FILE, "r");
     FILE *temp = fopen(TEMP_FILE, "w");
 
@@ -120,17 +120,25 @@ int delete_user_by_id(int id)
         if (readID == id)
         {
             deleted = 1;
-            continue; // Bu satırı yazmıyoruz = kullanıcıyı siliyoruz
+            continue; // Kullanıcıyı atla (sil)
         }
-
-        fputs(line, temp);
+        fputs(line, temp); // Diğer kullanıcıları geçici dosyaya yaz
     }
 
     fclose(fp);
     fclose(temp);
 
-    remove(ACCOUNT_FILE);
-    rename(TEMP_FILE, ACCOUNT_FILE);
+    if (remove(ACCOUNT_FILE) != 0)
+    {
+        perror("Orijinal dosya silinemedi");
+        return 0;
+    }
 
-    return deleted; // 1 = silindi, 0 = bulunamadı
+    if (rename(TEMP_FILE, ACCOUNT_FILE) != 0)
+    {
+        perror("Gecici dosya yeniden adlandirilamadi");
+        return 0;
+    }
+
+    return deleted;
 }
