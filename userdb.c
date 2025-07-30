@@ -27,15 +27,14 @@ int saveUserToFile(const User *p)
         break;
     }
 
-    fprintf(fp, "%d,%s,%s,%d,%c,%.2lf\n",
+    fprintf(fp, "%s,%s,%s,%d,%c,%.2lf\n",
             p->ID, p->Name, p->Surname, p->Birthday, genderChar, p->Balance);
-
     fclose(fp);
     return 0; // Başarılı
 }
 
 int update_user_in_file(const User *updatedUser)
-{ // Belirli ID'ye sahip kullanıcıyı güncelle
+{
     FILE *fp = fopen(ACCOUNT_FILE, "r");
     FILE *temp = fopen(TEMP_FILE, "w");
 
@@ -47,15 +46,15 @@ int update_user_in_file(const User *updatedUser)
 
     while (fgets(line, sizeof(line), fp))
     {
-        int readID;
-        sscanf(line, "%d,", &readID);
+        char readID[12];
+        sscanf(line, "%11[^,]", readID);
 
-        if (readID == updatedUser->ID)
+        if (strcmp(readID, updatedUser->ID) == 0)
         {
             char genderChar = (updatedUser->gender == Male) ? 'M' : (updatedUser->gender == Female) ? 'F'
                                                                                                     : 'O';
 
-            fprintf(temp, "%d,%s,%s,%d,%c,%.2f\n",
+            fprintf(temp, "%s,%s,%s,%d,%c,%.2f\n",
                     updatedUser->ID,
                     updatedUser->Name,
                     updatedUser->Surname,
@@ -79,22 +78,22 @@ int update_user_in_file(const User *updatedUser)
     return updated;
 }
 
-int checkUserExists(int id)
-{ // Belirli ID'ye sahip kullanıcının varlığını kontrol et
+int checkUserExistsInDB(char *ID)
+{
     FILE *fp = fopen(ACCOUNT_FILE, "r");
     if (!fp)
         return 0;
 
     char line[256];
-    int readID;
+    char existingID[12];
 
     while (fgets(line, sizeof(line), fp))
     {
-        sscanf(line, "%d,", &readID);
-        if (readID == id)
+        sscanf(line, "%11[^,]", existingID);
+        if (strcmp(existingID, ID) == 0)
         {
             fclose(fp);
-            return 1; // ID zaten var
+            return 1;
         }
     }
 
@@ -102,7 +101,7 @@ int checkUserExists(int id)
     return 0; // ID yok, kullanılabilir
 }
 
-int delete_user_by_id(int id)
+int delete_user_by_id(const char *ID)
 {
     FILE *fp = fopen(ACCOUNT_FILE, "r");
     FILE *temp = fopen(TEMP_FILE, "w");
@@ -111,18 +110,20 @@ int delete_user_by_id(int id)
         return 0;
 
     char line[256];
-    int readID;
+    char readID[12];
     int deleted = 0;
 
     while (fgets(line, sizeof(line), fp))
     {
-        sscanf(line, "%d,", &readID);
-        if (readID == id)
+        sscanf(line, "%11[^,]", readID);
+
+        if (strcmp(readID, ID) == 0)
         {
             deleted = 1;
-            continue; // Kullanıcıyı atla (sil)
+            continue; // Bu satırı atla
         }
-        fputs(line, temp); // Diğer kullanıcıları geçici dosyaya yaz
+
+        fputs(line, temp);
     }
 
     fclose(fp);
@@ -136,7 +137,7 @@ int delete_user_by_id(int id)
 
     if (rename(TEMP_FILE, ACCOUNT_FILE) != 0)
     {
-        perror("Gecici dosya yeniden adlandirilamadi");
+        perror("Geçici dosya yeniden adlandirilamadi");
         return 0;
     }
 

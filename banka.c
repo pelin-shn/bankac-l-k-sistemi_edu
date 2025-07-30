@@ -4,25 +4,27 @@
 #include <stdio.h>
 #include "cli.h"
 
-void createAccount(User p)
+void createAccount()
 {
 
-    if (checkUserExists(p.ID))
+    User newUser = addUserMenu();
+
+    if (checkUserExistsInDB(newUser.ID))
     {
         printf("Bu ID zaten mevcut! Lütfen farkli bir ID girin.\n");
         loglama("Kullanici eklenemedi: ID zaten mevcut.");
         return;
     }
 
-    if (saveUserToFile(&p))
-    {
-        printf("Kullanici başariyla eklendi.\n");
-        loglama("Yeni kullanici eklendi.");
-    }
-    else
+    if (saveUserToFile(&newUser))
     {
         printf("Kullanici eklenirken hata oluştu.\n");
         loglama("Kullanici eklenemedi!");
+    }
+    else
+    {
+        printf("Kullanici başariyla eklendi.\n");
+        loglama("Yeni kullanici eklendi.");
     }
 }
 
@@ -32,25 +34,14 @@ void start(void)
 
     while (1)
     {
-        printf("---BANKA YONETIM SISTEMI---\n");
-        printf("1. Kullanici Ekle\n");
-        printf("2. Kullanici Sil\n");
-        printf("3. Kullanici Listele\n");
-        printf("4. Kullanici Guncelle\n");
-        printf("5. Para Cek\n");
-        printf("6. Para Yatir\n");
-        printf("7. Para Transferi\n");
-        printf("0. Cikis\n");
-        printf("Seciminizi girin: ");
-        scanf("%d", &secim);
+        secim = choice();
 
         // Kullanıcı işlemleri.
         switch (secim)
         {
         case 1:
         {
-            User newUser = addUserMenu(); // Kullanıcıdan verileri al
-            createAccount(newUser);       // Dosyaya kaydet
+            createAccount(); // Dosyaya kaydet
             break;
         }
         case 2:

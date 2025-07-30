@@ -10,7 +10,7 @@ typedef enum
 
 typedef struct
 {
-    int ID;
+    char ID[12];
     char Name[50];
     char Surname[50];
     int Birthday;
@@ -28,5 +28,5 @@ void listUser(void);
 void withdrawMoney(void);
 void depositMoney(void);
 void transferMoney(void);
-void createAccount(User p);
+void createAccount(void);
 #endif

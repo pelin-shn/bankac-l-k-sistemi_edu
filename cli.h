@@ -14,11 +14,10 @@ void deleteUserMenu(void);
 void updateUserMenu(void);
 void listUserMsg(void);
 
-// Banka işlemleri arayüzleri
-void createAccountMenu(void);
-void deleteAccountMenu(void);
 void depositMenu(void);
 void withdrawMenu(void);
 void transferMenu(void);
+
+void getUserName();
 
 #endif

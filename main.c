@@ -5,5 +5,5 @@
 
 void main()
 {
-    start(); // Banka sistemini başlat
+    start();
 }

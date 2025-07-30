@@ -1,52 +1,37 @@
-#include <stdio.h>
 #include "control.h"
+#include <stdio.h>
 #include "banka.h"
 #include "userdb.h"
 
-void User_update()
-{ // Kullanici ekleme
-    User p;
-    char genderChar;
+int isValidDay(int day)
+{
+    return (day >= 1 && day <= 31);
+}
 
-    printf("ID: ");
-    scanf("%d", &p.ID);
-
-    if (checkUserExists(p.ID))
+bool checkUserName(const char *name)
+{
+    if (name == NULL || name[0] == '\0')
     {
-        printf("Bu ID zaten mevcut! Lütfen farkli bir ID girin.\n");
-        loglama("Kullanici eklenemedi: ID zaten mevcut.");
-        return;
+
+        return true;
+    }
+    else if (checkUserNameChars(name))
+    {
+        return true;
     }
 
-    printf("Name: ");
-    scanf("%s", p.Name);
+    return false;
+}
 
-    printf("Surname: ");
-    scanf("%s", p.Surname);
+bool checkUserNameChars(const char *name)
 
-    printf("Birthdate (YYYYMMDD): ");
-    scanf("%d", &p.Birthday);
-
-    printf("Gender (M/F/O): ");
-    scanf(" %c", &genderChar);
-    if (genderChar == 'M' || genderChar == 'm')
-        p.gender = Male;
-    else if (genderChar == 'F' || genderChar == 'f')
-        p.gender = Female;
-    else
-        p.gender = Other;
-
-    printf("Current Balance: ");
-    scanf("%lf", &p.Balance);
-
-    if (saveUserToFile(&p))
+{
+    for (int i = 0; name[i] != '\0'; i++)
     {
-        printf("User saved successfully.\n");
-        loglama("Yeni kullanici eklendi.");
+        if (!((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')))
+        {
+            return true; // Geçersiz karakter bulundu
+        }
     }
-    else
-    {
-        printf("Failed to save user.\n");
-        loglama("Kullanici eklenemedi!");
-    }
+    return false;
 }
