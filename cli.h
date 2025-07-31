@@ -12,12 +12,20 @@ User addUserMenu(void);
 void createUserMenu(void);
 void deleteUserMenu(void);
 void updateUserMenu(void);
-void listUserMsg(void);
+void listUserMenu(void);
 
 void depositMenu(void);
 void withdrawMenu(void);
 void transferMenu(void);
 
-void getUserName();
+void getUserName(User *p);
+void getUserSurname(User *p);
+int getUserBirthday(void);
+void getUserGender(User *p);
+double getUserBalance(void);
+
+char convertGenderToStr(const Gender g);
+void printUserInfo(const User p);
+void printCharList(const char *list, size_t size);
 
 #endif

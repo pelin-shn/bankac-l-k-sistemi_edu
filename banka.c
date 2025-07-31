@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include "cli.h"
 
-void createAccount()
+void createUser()
 {
 
     User newUser = addUserMenu();
+
+    printUserInfo(newUser);
 
     if (checkUserExistsInDB(newUser.ID))
     {
@@ -16,7 +18,7 @@ void createAccount()
         return;
     }
 
-    if (saveUserToFile(&newUser))
+    if (saveUserToFile(newUser))
     {
         printf("Kullanici eklenirken hata oluştu.\n");
         loglama("Kullanici eklenemedi!");
@@ -41,18 +43,19 @@ void start(void)
         {
         case 1:
         {
-            createAccount(); // Dosyaya kaydet
+            createUser(); // Dosyaya kaydet
             break;
         }
         case 2:
             deleteUserMenu();
             break;
         case 3:
-            updateUserMenu();
+            listUserMenu();
             break;
         case 4:
-            listUserMsg();
+            updateUserMenu();
             break;
+
         case 5:
             depositMenu();
             break;

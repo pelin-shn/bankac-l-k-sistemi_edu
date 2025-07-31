@@ -22,11 +22,11 @@ void start(void);
 
 // Kullanıcı işlemleri
 
-void deleteAccount(void);
+void deleteUser(void);
 void addUser(void);
 void listUser(void);
 void withdrawMoney(void);
 void depositMoney(void);
 void transferMoney(void);
-void createAccount(void);
+void createUser(void);
 #endif

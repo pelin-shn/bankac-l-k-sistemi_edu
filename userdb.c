@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "userdb.h"
 
 #define ACCOUNT_FILE "account.txt"
 #define TEMP_FILE "temp.txt"
 
-int saveUserToFile(const User *p)
+int saveUserToFile(const User p)
 {
     FILE *fp = fopen(ACCOUNT_FILE, "a");
     if (fp == NULL)
@@ -14,7 +15,7 @@ int saveUserToFile(const User *p)
     }
 
     char genderChar;
-    switch (p->gender)
+    switch (p.gender)
     {
     case Male:
         genderChar = 'M';
@@ -28,7 +29,7 @@ int saveUserToFile(const User *p)
     }
 
     fprintf(fp, "%s,%s,%s,%d,%c,%.2lf\n",
-            p->ID, p->Name, p->Surname, p->Birthday, genderChar, p->Balance);
+            p.ID, p.Name, p.Surname, p.Birthday, genderChar, p.Balance);
     fclose(fp);
     return 0; // Başarılı
 }
@@ -142,4 +143,48 @@ int delete_user_by_id(const char *ID)
     }
 
     return deleted;
+}
+
+void listeleKullanicilar(void)
+{
+    FILE *fp = fopen(ACCOUNT_FILE, "r");
+    if (fp == NULL)
+    {
+        printf("HATA: %s dosyası açılamadı!\n", ACCOUNT_FILE);
+        return;
+    }
+
+    char satir[256];
+
+    printf("---------------------------------------------------------------------------------\n");
+    printf("ID         | Ad       | Soyad    | Dogum Tarihi | Cinsiyet | Bakiye\n");
+    printf("---------------------------------------------------------------------------------\n");
+
+    while (fgets(satir, sizeof(satir), fp))
+    {
+        // Satırı virgül ile ayır
+        char *id = strtok(satir, ",");
+        char *ad = strtok(NULL, ",");
+        char *soyad = strtok(NULL, ",");
+        char *gunStr = strtok(NULL, ",");
+        char *ayStr = strtok(NULL, ",");
+        char *yilStr = strtok(NULL, ",");
+        char *cinsiyetStr = strtok(NULL, ",");
+        char *bakiyeStr = strtok(NULL, "\n");
+
+        if (id && ad && soyad && gunStr && ayStr && yilStr && cinsiyetStr && bakiyeStr)
+        {
+            int gun = atoi(gunStr);
+            int ay = atoi(ayStr);
+            int yil = atoi(yilStr);
+            double bakiye = atof(bakiyeStr);
+
+            printf("%-11s | %-8s | %-8s | %02d/%02d/%04d | %-8s | %.2lf\n",
+                   id, ad, soyad, gun, ay, yil, cinsiyetStr, bakiye);
+        }
+
+        printf("---------------------------------------------------------------------------------\n");
+
+        fclose(fp);
+    }
 }

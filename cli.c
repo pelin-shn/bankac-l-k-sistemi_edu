@@ -6,6 +6,8 @@
 #include "loglama.h"
 #include "control.h"
 
+#define ACCOUNT_FILE "account.txt"
+
 char *generate_unique_id()
 {
     static char id[12];
@@ -50,7 +52,6 @@ User addUserMenu()
     User p;
 
     char genderChar;
-    int day, mounth, year;
 
     printf("\n--- Kullanici Ekleme ---\n");
 
@@ -58,44 +59,14 @@ User addUserMenu()
     strcpy(p.ID, generate_unique_id());
     printf("Oluşturulan kullanici ID: %s\n", p.ID);
 
-    getUserName();
+    getUserName(&p);
+    getUserSurname(&p);
+    p.Birthday = getUserBirthday();
+    getUserGender(&p);
+    p.Balance = getUserBalance();
 
-    printf("Soyad: ");
-    scanf("%s", p.Surname);
-
-    printf("Doğum Tarihi (day mounth year): ");
-    scanf("%d %d %d", &day, &mounth, &year);
-
-    // Tarih kontrolü (gün 1-31 arası mı?)
-    if (!isValidDay(day))
-    {
-        printf("Hatali gün girdiniz! 1-31 arasinda olmali.\n");
-        loglama("Kullanici ekleme başarisiz: Geçersiz gün.");
-        strcpy(p.ID, "");
-        return p;
-    }
-    p.Birthday = day * 1000000 + mounth * 10000 + year;
-
-    printf("Cinsiyet (M/F/O): ");
-    scanf(" %c", &genderChar);
-
-    switch (genderChar)
-    {
-    case 'M':
-    case 'm':
-        p.gender = Male;
-        break;
-    case 'F':
-    case 'f':
-        p.gender = Female;
-        break;
-    default:
-        p.gender = Other;
-        break;
-    }
-
-    printf("Başlangic Bakiyesi: ");
-    scanf("%lf", &p.Balance);
+    printf("%s,%s,%s,%d,%c,%.2lf\n",
+           p.ID, p.Name, p.Surname, p.Birthday, genderChar, p.Balance);
 
     return p;
 }
@@ -144,15 +115,49 @@ void deleteUserMenu(void)
     }
 }
 
+void listUserMenu(void)
+{
+    FILE *fp = fopen(ACCOUNT_FILE, "r");
+    if (fp == NULL)
+    {
+        printf("HATA: %s dosyasi acilamadi!\n", ACCOUNT_FILE);
+        return;
+    }
+
+    char satir[256];
+    printf("\n--- Kullanici Listesi ---\n");
+    printf("ID\tAd\tSoyad\tDoğum Tarihi\tCinsiyet\tBakiye\n");
+    printf("------------------------------------------------------------\n");
+
+    while (fgets(satir, sizeof(satir), fp))
+    {
+        char *id = strtok(satir, ",");
+        char *ad = strtok(NULL, ",");
+        char *soyad = strtok(NULL, ",");
+        char *dogumTarihi = strtok(NULL, ",");
+        char *cinsiyetStr = strtok(NULL, ",");
+        char *bakiyeStr = strtok(NULL, "\n");
+
+        if (!(id && ad && soyad && dogumTarihi && cinsiyetStr && bakiyeStr))
+            continue;
+
+        // Tarihi gün/ay/yıl olarak ayırmak için
+        char gun[3] = {dogumTarihi[0], dogumTarihi[1], '\0'};
+        char ay[3] = {dogumTarihi[2], dogumTarihi[3], '\0'};
+        char yil[5] = {dogumTarihi[4], dogumTarihi[5], dogumTarihi[6], dogumTarihi[7], '\0'};
+
+        printf("%s\t%s\t%s\t%s/%s/%s\t%c\t%s\n",
+               id, ad, soyad, gun, ay, yil, cinsiyetStr[0], bakiyeStr);
+    }
+
+    fclose(fp);
+    loglama("Kullanici listelendi.");
+}
+
 // Henüz uygulanmayan fonksiyonlar
 void updateUserMenu(void)
 {
     printf("Kullanici güncelleme menüsü (henüz uygulanmadi).\n");
-}
-
-void listUserMsg(void)
-{
-    printf("Kullanici listeleme menüsü (henüz uygulanmadi).\n");
 }
 
 void depositMenu(void)
@@ -170,19 +175,140 @@ void transferMenu(void)
     printf("Para transfer menüsü (henüz uygulanmadi).\n");
 }
 
-void getUserName()
+void getUserName(User *p)
 {
     while (1)
     {
-        char name[50];
         printf("Kullanici adini girin: ");
-        scanf("%49s", name);
+        scanf("%49s", p->Name);
 
-        if (!checkUserName(name))
+        if (!checkUserName(p->Name))
         {
             return;
         }
         printf("Kullanici adi geçersiz! Lütfen harflerden oluşan bir isim girin.\n");
         loglama("Kullanici ekleme basarisiz: Geçersiz kullanıcı adı.");
+    }
+}
+
+void getUserSurname(User *p)
+{
+    while (1)
+    {
+        printf("Kullanici soyadini girin: ");
+        scanf("%49s", p->Surname);
+
+        if (!checkUserSurname(p->Surname))
+        {
+            return;
+        }
+        printf("Kullanici soyadi geçersiz! Lütfen geçerli bir soyisim girin.\n");
+        loglama("Kullanici ekleme basarisiz: Geçersiz kullanici soyadi.");
+    }
+}
+
+int getUserBirthday()
+{
+    int day, month, year;
+    while (1)
+    {
+        printf("Doğum Tarihi (DD MM YYYY): ");
+        scanf("%d %d %d", &day, &month, &year);
+
+        if (!checkUserBirthday(day, month, year))
+        {
+            printf("Doğum tarihi: %02d/%02d/%04d\n", day, month, year);
+            // DDMMYYYY formatında döndür
+            return day * 1000000 + month * 10000 + year;
+        }
+        printf("Doğum tarihi geçersiz! Lütfen 1-31 gün, 1-12 ay ve 1900-2100 yil araliginda bir tarih girin.\n");
+        loglama("Kullanici ekleme basarisiz: Geçersiz doğum tarihi.");
+    }
+}
+
+void printUserInfo(const User p)
+{
+    printf("Kullanici Bilgileri:\n");
+    printf("ID: ");
+    printCharList(p.ID, 12);
+    printf("Ad: ");
+    printCharList(p.Name, 50);
+    printf("Soyad: ");
+    printCharList(p.Surname, 50);
+    printf("Dogum Tarihi: %d\n", p.Birthday);
+    printf("Cinsiyet: %c\n", (convertGenderToStr(p.gender)));
+    printf("Bakiye: %.2lf\n", p.Balance);
+}
+
+char convertGenderToStr(Gender g)
+{
+    char genderStr;
+    switch (g)
+    {
+    case Male:
+        genderStr = 'M';
+        break;
+    case Female:
+        genderStr = 'F';
+        break;
+    default:
+        genderStr = 'O';
+        break;
+    }
+    return genderStr;
+}
+
+void printCharList(const char *list, size_t size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        if (list[i] == '\0')
+            break;
+        printf("%c", list[i]);
+    }
+    printf("\n");
+}
+
+void getUserGender(User *p)
+{
+    char genderChar;
+    printf("Cinsiyet (M/F/O): ");
+    scanf(" %c", &genderChar);
+    switch (genderChar)
+    {
+    case 'M':
+    case 'm':
+        p->gender = Male;
+        break;
+    case 'F':
+    case 'f':
+        p->gender = Female;
+        break;
+    default:
+        p->gender = Other;
+        break;
+    }
+}
+
+double getUserBalance(void)
+{
+    char input[100];
+    double balance;
+
+    while (1)
+    {
+        printf("Başlangiç Bakiyesi: ");
+        scanf("%99s", input);
+
+        if (!checkUserBalance(input)) // sadece rakamsa true
+        {
+            balance = strtod(input, NULL);
+            return balance;
+        }
+        else
+        {
+            printf("Geçersiz bakiye! Lütfen sadece rakamlardan oluşan bir değer girin.\n");
+            loglama("Kullanici ekleme başarisiz: Geçersiz bakiye.");
+        }
     }
 }
