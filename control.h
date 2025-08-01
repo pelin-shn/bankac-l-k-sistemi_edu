@@ -14,4 +14,6 @@ bool checkUserSurname(const char *surname);
 bool checkUserSurnameChars(const char *surname);
 bool checkUserBirthday(int day, int month, int year);
 bool checkUserBalance(const char *balanceStr);
+bool withdrawMoney(const char *id, double amount);
+bool userDepositMoney(const char *id, double amount);
 #endif

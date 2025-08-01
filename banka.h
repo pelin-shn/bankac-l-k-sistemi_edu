@@ -1,6 +1,8 @@
 #ifndef BANKA_H
 #define BANKA_H
 
+#include <stdbool.h>
+
 typedef enum
 {
     Male,
@@ -25,7 +27,7 @@ void start(void);
 void deleteUser(void);
 void addUser(void);
 void listUser(void);
-void withdrawMoney(void);
+void withdrawMenu(void);
 void depositMoney(void);
 void transferMoney(void);
 void createUser(void);

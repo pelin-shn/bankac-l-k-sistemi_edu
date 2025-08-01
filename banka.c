@@ -55,13 +55,13 @@ void start(void)
         case 4:
             updateUserMenu();
             break;
-
         case 5:
-            depositMenu();
-            break;
-        case 6:
             withdrawMenu();
             break;
+        case 6:
+            depositMenu();
+            break;
+
         case 7:
             transferMenu();
             break;

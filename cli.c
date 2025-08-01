@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "banka.h"
+#include <stdbool.h>
 #include "cli.h"
 #include "loglama.h"
 #include "control.h"
+#include "userdb.h"
 
 #define ACCOUNT_FILE "account.txt"
 
@@ -154,25 +157,75 @@ void listUserMenu(void)
     loglama("Kullanici listelendi.");
 }
 
-// Henüz uygulanmayan fonksiyonlar
-void updateUserMenu(void)
+void withdrawMenu(void)
 {
-    printf("Kullanici güncelleme menüsü (henüz uygulanmadi).\n");
+    char id[20];
+    double miktar;
+
+    printf("\n--- Para Çekme ---\n");
+    printf("ID girin: ");
+    scanf("%s", id);
+
+    printf("Çekmek istediğiniz tutar: ");
+    scanf("%lf", &miktar);
+
+    int sonuc = withdrawMoney(id, miktar);
+
+    if (sonuc == 1)
+        loglama("Para çekme işlemi başarılı.");
+    else if (sonuc == -1)
+        loglama("Yetersiz bakiye nedeniyle para çekilemedi.");
+    else
+        loglama("Geçersiz kullanıcı ID nedeniyle para çekilemedi.");
 }
 
 void depositMenu(void)
 {
-    printf("Para yatirma menüsü (henüz uygulanmadi).\n");
-}
+    char id[20];
+    double miktar;
 
-void withdrawMenu(void)
-{
-    printf("Para çekme menüsü (henüz uygulanmadi).\n");
+    printf("\n--- Para Yatırma ---\n");
+    printf("ID girin: ");
+    scanf("%s", id);
+
+    printf("Yatırmak istediğiniz tutar: ");
+    scanf("%lf", &miktar);
+
+    bool sonuc = userDepositMoney(id, miktar);
+
+    if (sonuc == 1)
+        loglama("Para yatırma işlemi başarılı.");
+    else if (sonuc == -1)
+        loglama("Yetersiz bakiye nedeniyle para yatırma işlemi yapılamaz.");
+    else
+        loglama("Geçersiz kullanıcı ID nedeniyle para yatırma işlemi yapılamaz.");
 }
 
 void transferMenu(void)
 {
-    printf("Para transfer menüsü (henüz uygulanmadi).\n");
+    char gondericiID[20], aliciID[20];
+    double miktar;
+
+    printf("\n--- PARA TRANSFERİ ---\n");
+    printf("Gönderen kullanıcı ID: ");
+    scanf("%s", gondericiID);
+
+    printf("Alıcı kullanıcı ID: ");
+    scanf("%s", aliciID);
+
+    printf("Gönderilecek tutar (TL): ");
+    scanf("%lf", &miktar);
+
+    if (!userTransferMoney(gondericiID, aliciID, miktar))
+    {
+        printf("Transfer işlemi başarısız.\n");
+    }
+}
+
+// Henüz uygulanmayan fonksiyonlar
+void updateUserMenu(void)
+{
+    printf("Kullanici güncelleme menüsü (henüz uygulanmadi).\n");
 }
 
 void getUserName(User *p)
